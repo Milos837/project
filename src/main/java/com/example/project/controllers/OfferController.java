@@ -62,7 +62,7 @@ public class OfferController {
 		return null;
 	}
 
-	// 3.6
+	// 3.6	TESTIRANO
 	@RequestMapping(value = "/project/offers/{id}", method = RequestMethod.DELETE)
 	public OfferEntity deleteOffer(@PathVariable Integer id) {
 		for (OfferEntity offerEntity : getDb()) {
@@ -85,7 +85,7 @@ public class OfferController {
 		return null;
 	}
 
-	// 3.8
+	// 3.8	TESTIRANO
 	@RequestMapping(value = "/project/offers/{id}/status/{status}", method = RequestMethod.PUT)
 	public OfferEntity updateOfferStatus(@PathVariable Integer id, @PathVariable EOfferStatus status) {
 		for (OfferEntity offerEntity : getDb()) {
@@ -97,7 +97,7 @@ public class OfferController {
 		return null;
 	}
 
-	// 3.9
+	// 3.9	TESTIRANO
 	@RequestMapping(value = "/project/offers/findByPrice/{lowerPrice}/and/{upperPrice}", method = RequestMethod.GET)
 	public List<OfferEntity> findByPrice(@PathVariable Double lowerPrice, @PathVariable Double upperPrice) {
 		List<OfferEntity> lista = new ArrayList<>();

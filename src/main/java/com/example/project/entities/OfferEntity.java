@@ -18,7 +18,7 @@ public class OfferEntity {
 
 	public OfferEntity() {
 		super();
-		this.id=counterOffer;
+		this.setId(counterOffer);;
 		counterOffer++;
 	}
 
@@ -26,9 +26,9 @@ public class OfferEntity {
 		return id;
 	}
 
-	//private void setId(Integer id) {
-		//this.id = id;
-	//}
+	private void setId(Integer id) {
+		this.id = id;
+	}
 
 	public String getOfferName() {
 		return offerName;
