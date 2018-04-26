@@ -5,19 +5,16 @@ public class CategoryEntity {
 	protected Integer id;
 	protected String categoryName;
 	protected String categoryDescription;
-	protected static Integer counterCategory = 1;
 
 	public CategoryEntity() {
-		super();
-		this.setId(counterCategory);
-		counterCategory++;
+
 	}
 
 	public Integer getId() {
 		return id;
 	}
 
-	private void setId(Integer id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

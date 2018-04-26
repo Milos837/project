@@ -14,19 +14,16 @@ public class OfferEntity {
 	protected Integer availableOffers;
 	protected Integer boughtOffers;
 	protected EOfferStatus offerstatus;
-	protected static Integer counterOffer = 1;
 
 	public OfferEntity() {
-		super();
-		this.setId(counterOffer);;
-		counterOffer++;
+
 	}
 
 	public Integer getId() {
 		return id;
 	}
 
-	private void setId(Integer id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

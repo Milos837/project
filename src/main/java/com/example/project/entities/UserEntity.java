@@ -11,19 +11,16 @@ public class UserEntity {
 	protected String password;
 	protected String email;
 	protected EUserRole userRole;
-	protected static Integer counterUser = 1;
 	
 	public UserEntity() {
-		super();
-		this.setId(counterUser);
-		counterUser++;
+
 	}
 
 	public Integer getId() {
 		return id;
 	}
 
-	private void setId(Integer id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
