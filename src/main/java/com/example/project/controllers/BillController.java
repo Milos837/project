@@ -1,6 +1,6 @@
 package com.example.project.controllers;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.project.entities.BillEntity;
-import com.example.project.entities.OfferEntity;
 import com.example.project.repositories.BillRepository;
-import com.example.project.repositories.CategoryRepository;
 import com.example.project.repositories.OfferRepository;
 import com.example.project.repositories.UserRepository;
 
@@ -30,9 +28,6 @@ public class BillController {
 	@Autowired
 	private UserRepository userRepository;
 	
-	@Autowired
-	private CategoryRepository categoryRepository;
-	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<BillEntity> getAllBills() {
 		return (List<BillEntity>) billRepository.findAll();
@@ -43,6 +38,7 @@ public class BillController {
 		BillEntity bill = new BillEntity();
 		bill.setOffer(offerRepository.findById(offerId).get());
 		bill.setUser(userRepository.findById(buyerId).get());
+		bill.setBillCreated(LocalDate.now());
 		return billRepository.save(bill);
 	}
 	
@@ -70,15 +66,15 @@ public class BillController {
 	}
 	
 	@RequestMapping(value = "/findByCategory/{categoryId}", method = RequestMethod.GET)
-	public List<BillEntity> findByCategory(@PathVariable Integer id) {
-		List<OfferEntity> list1 = categoryRepository.findById(id).get().getOffer();
-		List<BillEntity> list2 = new ArrayList<>();
-		for (OfferEntity offerEntity : list1) {
-			if(offerEntity.getBill() != null) {
-				//DOVRSI
-			}
-		}
-		return null;
+	public List<BillEntity> findByCategory(@PathVariable Integer categoryId) {
+		return billRepository.findByCategoryCustomQuery(categoryId);
+	}
+	
+	@RequestMapping(value = "/findByDate/{startDate}/and/{endDate}", method = RequestMethod.GET)
+	public List<BillEntity> findByDate(@PathVariable String startDate, @PathVariable String endDate) {
+		LocalDate startDateParsed = LocalDate.parse(startDate);
+		LocalDate endDateParsed = LocalDate.parse(endDate);
+		return billRepository.findByBillCreatedBetween(startDateParsed, endDateParsed);
 	}
 
 }
