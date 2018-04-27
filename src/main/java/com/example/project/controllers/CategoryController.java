@@ -1,8 +1,8 @@
 package com.example.project.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,73 +10,48 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.project.entities.CategoryEntity;
+import com.example.project.repositories.CategoryRepository;
 
 @RestController
+@RequestMapping(value = "/project/categories")
 public class CategoryController {
 
-	List<CategoryEntity> allCategories;
+	@Autowired
+	private CategoryRepository categoryRepository;
 
-	// 2.2	TESTIRANO
-	public List<CategoryEntity> getDb() {
-		if (allCategories == null) {
-			allCategories = new ArrayList<>();
-
-			CategoryEntity c1 = new CategoryEntity();
-			c1.setCategoryName("Automobili");
-			c1.setCategoryDescription("Oglasi sa polovnim automobilima");
-			allCategories.add(c1);
-
-		}
-		return allCategories;
-	}
-
-	// 2.3	TESTIRANO
-	@RequestMapping(value = "/project/categories", method = RequestMethod.GET)
+	// Vrati sve kategorije
+	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<CategoryEntity> getCategories() {
-		return getDb();
+		return (List<CategoryEntity>) categoryRepository.findAll();
 	}
 
-	// 2.4	TESTIRANO
-	@RequestMapping(value = "/project/categories", method = RequestMethod.POST)
+	// Dodaj novu kategoriju
+	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public CategoryEntity addCategory(@RequestBody CategoryEntity category) {
-		getDb().add(category);
-		return category;
+		return categoryRepository.save(category);
 	}
 
-	// 2.5	TESTIRANO
-	@RequestMapping(value = "/project/categories/{id}", method = RequestMethod.PUT)
+	// Azuriraj kategoriju po ID-u
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public CategoryEntity updateCategory(@PathVariable Integer id, @RequestBody CategoryEntity cat) {
-		for (CategoryEntity categoryEntity : getDb()) {
-			if (categoryEntity.getId().equals(id)) {
-				categoryEntity.setCategoryName(cat.getCategoryName());
-				categoryEntity.setCategoryDescription(cat.getCategoryDescription());
-				return categoryEntity;
-			}
-		}
-		return null;
+		CategoryEntity category = categoryRepository.findById(id).get();
+		category.setCategoryName(cat.getCategoryName());
+		category.setCategoryDescription(cat.getCategoryDescription());
+		return categoryRepository.save(category);
 	}
 
-	// 2.6	TESTIRANO
-	@RequestMapping(value = "/project/categories/{id}", method = RequestMethod.DELETE)
+	// Obrisi kategoriju po ID-u
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public CategoryEntity deleteCategory(@PathVariable Integer id) {
-		for (CategoryEntity categoryEntity : getDb()) {
-			if (categoryEntity.getId().equals(id)) {
-				getDb().remove(categoryEntity);
-				return categoryEntity;
-			}
-		}
-		return null;
+		CategoryEntity temp = categoryRepository.findById(id).get();
+		categoryRepository.deleteById(id);
+		return temp;
 	}
 
-	// 2.7	TESTIRANO
-	@RequestMapping(value = "/project/categories/{id}", method = RequestMethod.GET)
+	// Vrati kategoriju po ID-u
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public CategoryEntity getCategory(@PathVariable Integer id) {
-		for (CategoryEntity categoryEntity : getDb()) {
-			if (categoryEntity.getId().equals(id)) {
-				return categoryEntity;
-			}
-		}
-		return null;
+		return categoryRepository.findById(id).get();
 	}
 
 }

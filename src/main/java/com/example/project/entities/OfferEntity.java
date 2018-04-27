@@ -1,19 +1,73 @@
 package com.example.project.entities;
 
-import com.example.project.entities.enums.EOfferStatus;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+import com.example.project.entities.enums.EOfferStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@Entity
+@Table(name = "offer")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class OfferEntity {
 
+	@Id
+	@GeneratedValue
 	protected Integer id;
+	
+	@OneToMany(mappedBy = "offer", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JsonIgnore
+	protected List<BillEntity> bill;
+	
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user")
+	protected UserEntity user;
+	
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JoinColumn(name = "category")
+	protected CategoryEntity category;
+	
+	@Column
 	protected String offerName;
+	
+	@Column
 	protected String offerCreated;
+	
+	@Column
 	protected String offerExpires;
+	
+	@Column
 	protected Double regularPrice;
+	
+	@Column
 	protected Double acttionPrice;
+	
+	@Column
 	protected String imagePath;
+	
+	@Column
 	protected Integer availableOffers;
+	
+	@Column
 	protected Integer boughtOffers;
+	
+	@Column
 	protected EOfferStatus offerstatus;
+	
+	@Version
+	protected Integer version;
 
 	public OfferEntity() {
 
@@ -25,6 +79,30 @@ public class OfferEntity {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public List<BillEntity> getBill() {
+		return bill;
+	}
+
+	public void setBill(List<BillEntity> bill) {
+		this.bill = bill;
+	}
+
+	public UserEntity getUser() {
+		return user;
+	}
+
+	public void setUser(UserEntity user) {
+		this.user = user;
+	}
+
+	public CategoryEntity getCategory() {
+		return category;
+	}
+
+	public void setCategory(CategoryEntity category) {
+		this.category = category;
 	}
 
 	public String getOfferName() {
@@ -97,6 +175,14 @@ public class OfferEntity {
 
 	public void setOfferstatus(EOfferStatus offerstatus) {
 		this.offerstatus = offerstatus;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
 	}
 
 	@Override
