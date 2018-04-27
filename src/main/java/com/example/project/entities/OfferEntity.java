@@ -26,46 +26,50 @@ public class OfferEntity {
 	@Id
 	@GeneratedValue
 	protected Integer id;
-	
+
+	@OneToMany(mappedBy = "voucher", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@JsonIgnore
+	protected List<VoucherEntity> voucher;
+
 	@OneToMany(mappedBy = "offer", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
 	protected List<BillEntity> bill;
-	
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user")
 	protected UserEntity user;
-	
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "category")
 	protected CategoryEntity category;
-	
+
 	@Column
 	protected String offerName;
-	
+
 	@Column
 	protected String offerCreated;
-	
+
 	@Column
 	protected String offerExpires;
-	
+
 	@Column
 	protected Double regularPrice;
-	
+
 	@Column
 	protected Double acttionPrice;
-	
+
 	@Column
 	protected String imagePath;
-	
+
 	@Column
 	protected Integer availableOffers;
-	
+
 	@Column
 	protected Integer boughtOffers;
-	
+
 	@Column
 	protected EOfferStatus offerstatus;
-	
+
 	@Version
 	protected Integer version;
 
@@ -127,6 +131,14 @@ public class OfferEntity {
 
 	public void setOfferExpires(String offerExpires) {
 		this.offerExpires = offerExpires;
+	}
+
+	public List<VoucherEntity> getVoucher() {
+		return voucher;
+	}
+
+	public void setVoucher(List<VoucherEntity> voucher) {
+		this.voucher = voucher;
 	}
 
 	public Double getRegularPrice() {
