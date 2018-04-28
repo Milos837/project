@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.project.entities.OfferEntity;
 import com.example.project.entities.VoucherEntity;
 import com.example.project.entities.enums.EUserRole;
 import com.example.project.repositories.OfferRepository;
@@ -57,7 +58,15 @@ public class VoucherController {
 		if (userRepository.findById(buyerId).get().getUserRole().equals(EUserRole.ROLE_CUSTOMER)
 				&& offerRepository.existsById(offerId)) {
 			VoucherEntity voucher = new VoucherEntity();
-			voucher.setOffer(offerRepository.findById(offerId).get());
+			OfferEntity offer = offerRepository.findById(id).get();
+			if (isUsed == false) {
+				offer.setAvailableOffers(offer.getAvailableOffers() - 1);
+				offer.setBoughtOffers(offer.getBoughtOffers() + 1);
+			} else {
+				offer.setAvailableOffers(offer.getAvailableOffers() + 1);
+				offer.setBoughtOffers(offer.getBoughtOffers() - 1);
+			}
+			voucher.setOffer(offerRepository.save(offer));
 			voucher.setUser(userRepository.findById(buyerId).get());
 			voucher.setExpirationDate(LocalDate.parse(expDate));
 			voucher.setIsUsed(isUsed);
@@ -73,17 +82,17 @@ public class VoucherController {
 		voucherRepository.deleteById(id);
 		return temp;
 	}
-	
+
 	@RequestMapping(value = "/findByBuyer/{buyerId}", method = RequestMethod.GET)
 	public List<VoucherEntity> findByBuyer(@PathVariable Integer buyerId) {
 		return voucherRepository.findByBuyerCustomQuery(buyerId);
 	}
-	
+
 	@RequestMapping(value = "/findByOffer/{offerId}", method = RequestMethod.GET)
 	public List<VoucherEntity> findByOffer(@PathVariable Integer offerId) {
 		return voucherRepository.findByOfferCustomQuery(offerId);
 	}
-	
+
 	@RequestMapping(value = "/findNonExpiredVoucher", method = RequestMethod.GET)
 	public List<VoucherEntity> findNonExpired() {
 		return voucherRepository.findByExpirationDateLessThan(LocalDate.now());
