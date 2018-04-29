@@ -18,7 +18,7 @@ import com.example.project.repositories.UserRepository;
 import com.example.project.repositories.VoucherRepository;
 
 @RestController
-@RequestMapping(value = "/api/v1/vouchers")
+@RequestMapping(value = "/api/v1/project/vouchers")
 public class VoucherController {
 
 	@Autowired
@@ -36,7 +36,7 @@ public class VoucherController {
 		return (List<VoucherEntity>) voucherRepository.findAll();
 	}
 
-	// Dodaj voucher
+	// Dodaj voucher TESTIRAO
 	@RequestMapping(value = "/{offerId}/buyer/{buyerId}", method = RequestMethod.POST)
 	public VoucherEntity addVoucher(@PathVariable Integer offerId, @PathVariable Integer buyerId) {
 		if (userRepository.findById(buyerId).get().getUserRole().equals(EUserRole.ROLE_CUSTOMER)
@@ -83,19 +83,22 @@ public class VoucherController {
 		return temp;
 	}
 
+	// Vrati voucher po kupcu TESTIRAO
 	@RequestMapping(value = "/findByBuyer/{buyerId}", method = RequestMethod.GET)
 	public List<VoucherEntity> findByBuyer(@PathVariable Integer buyerId) {
 		return voucherRepository.findByBuyerCustomQuery(buyerId);
 	}
 
+	// Vrati voucher po ponudi TESTIRAO
 	@RequestMapping(value = "/findByOffer/{offerId}", method = RequestMethod.GET)
 	public List<VoucherEntity> findByOffer(@PathVariable Integer offerId) {
 		return voucherRepository.findByOfferCustomQuery(offerId);
 	}
 
+	// Vrati vouchere koji nisu istekli TESTIRANO
 	@RequestMapping(value = "/findNonExpiredVoucher", method = RequestMethod.GET)
 	public List<VoucherEntity> findNonExpired() {
-		return voucherRepository.findByExpirationDateLessThan(LocalDate.now());
+		return voucherRepository.findByExpirationDateGreaterThan(LocalDate.now());
 	}
 
 }

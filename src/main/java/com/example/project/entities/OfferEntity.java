@@ -27,7 +27,7 @@ public class OfferEntity {
 	@GeneratedValue
 	protected Integer id;
 
-	@OneToMany(mappedBy = "voucher", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "offer", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
 	protected List<VoucherEntity> voucher;
 

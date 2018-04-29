@@ -18,7 +18,7 @@ import com.example.project.repositories.OfferRepository;
 import com.example.project.repositories.UserRepository;
 
 @RestController
-@RequestMapping(value = "/project/offers")
+@RequestMapping(value = "/api/v1/project/offers")
 public class OfferController {
 
 	@Autowired
@@ -30,7 +30,7 @@ public class OfferController {
 	@Autowired
 	private CategoryRepository categoryRepository;
 
-	// Vrati sve ponudde
+	// Vrati sve ponude TESTIRAO
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<OfferEntity> getOffers() {
 		return (List<OfferEntity>) offerRepository.findAll();
@@ -40,7 +40,7 @@ public class OfferController {
 	// Korisnik mora biti ROLE_SELLER
 	@RequestMapping(value = "/{categoryId}/seller/{sellerId}", method = RequestMethod.POST)
 	public OfferEntity addCategoryAndUserForOffer(@PathVariable Integer categoryId, @PathVariable Integer sellerId) {
-		if(userRepository.findById(sellerId).get().getUserRole().equals(EUserRole.ROLE_SELLER)) {
+		if (userRepository.findById(sellerId).get().getUserRole().equals(EUserRole.ROLE_SELLER)) {
 			OfferEntity offer = new OfferEntity();
 			offer.setCategory(categoryRepository.findById(categoryId).get());
 			offer.setUser(userRepository.findById(sellerId).get());
@@ -51,41 +51,53 @@ public class OfferController {
 		return null;
 	}
 
-	// Azuriraj ponudu
+	// Azuriraj ponudu TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public OfferEntity updateOffer(@PathVariable Integer id, @RequestBody OfferEntity offer) {
-		OfferEntity offerEntity = offerRepository.findById(id).get();
-		offerEntity.setActtionPrice(offer.getActtionPrice());
-		offerEntity.setAvailableOffers(offer.getAvailableOffers());
-		offerEntity.setBoughtOffers(offer.getBoughtOffers());
-		offerEntity.setImagePath(offer.getImagePath());
-		offerEntity.setOfferCreated(offer.getOfferCreated());
-		offerEntity.setOfferExpires(offer.getOfferExpires());
-		offerEntity.setOfferName(offer.getOfferName());
-		offerEntity.setRegularPrice(offer.getRegularPrice());
-		return offerRepository.save(offerEntity);
+		if (offerRepository.existsById(id)) {
+			OfferEntity offerEntity = offerRepository.findById(id).get();
+			offerEntity.setActtionPrice(offer.getActtionPrice());
+			offerEntity.setAvailableOffers(offer.getAvailableOffers());
+			offerEntity.setBoughtOffers(offer.getBoughtOffers());
+			offerEntity.setImagePath(offer.getImagePath());
+			offerEntity.setOfferCreated(offer.getOfferCreated());
+			offerEntity.setOfferExpires(offer.getOfferExpires());
+			offerEntity.setOfferName(offer.getOfferName());
+			offerEntity.setRegularPrice(offer.getRegularPrice());
+			return offerRepository.save(offerEntity);
+		}
+		return null;
 	}
 
-	// Obrisi ponudu po ID-u
+	// Obrisi ponudu po ID-u TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public OfferEntity deleteOffer(@PathVariable Integer id) {
-		OfferEntity offer = offerRepository.findById(id).get();
-		offerRepository.deleteById(id);
-		return offer;
+		if (offerRepository.existsById(id)) {
+			OfferEntity offer = offerRepository.findById(id).get();
+			offerRepository.deleteById(id);
+			return offer;
+		}
+		return null;
 	}
 
-	// Vrati ponudu po ID-u
+	// Vrati ponudu po ID-u TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public OfferEntity getOffer(@PathVariable Integer id) {
-		return offerRepository.findById(id).get();
+		if (offerRepository.existsById(id)) {
+			return offerRepository.findById(id).get();
+		}
+		return null;
 	}
 
-	// Promeni status ponude
+	// Promeni status ponude TESTIRAO
 	@RequestMapping(value = "/{id}/status/{status}", method = RequestMethod.PUT)
 	public OfferEntity updateOfferStatus(@PathVariable Integer id, @PathVariable EOfferStatus status) {
-		OfferEntity offer = offerRepository.findById(id).get();
-		offer.setOfferstatus(status);
-		return offerRepository.save(offer);
+		if (offerRepository.existsById(id)) {
+			OfferEntity offer = offerRepository.findById(id).get();
+			offer.setOfferstatus(status);
+			return offerRepository.save(offer);
+		}
+		return null;
 	}
 
 	// Nadji ponude izmedju zadate cene
@@ -93,14 +105,13 @@ public class OfferController {
 	public List<OfferEntity> findByPrice(@PathVariable Double lowerPrice, @PathVariable Double upperPrice) {
 		return offerRepository.findByActtionPriceBetween(lowerPrice, upperPrice);
 	}
-	
+
 	// Promeni kategoriju ponude
-	@RequestMapping(value = "/{id}/category/{categoryId}", method = RequestMethod.PUT) 
+	@RequestMapping(value = "/{id}/category/{categoryId}", method = RequestMethod.PUT)
 	public OfferEntity changeCategory(@PathVariable Integer offerId, @PathVariable Integer catId) {
 		OfferEntity offer = offerRepository.findById(offerId).get();
 		offer.setCategory(categoryRepository.findById(catId).get());
 		return offerRepository.save(offer);
 	}
 
-	
 }
