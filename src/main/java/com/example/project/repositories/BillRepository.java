@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.example.project.entities.BillEntity;
+import com.example.project.entities.OfferEntity;
 
 public interface BillRepository extends CrudRepository<BillEntity, Integer> {
 	
@@ -16,5 +17,7 @@ public interface BillRepository extends CrudRepository<BillEntity, Integer> {
 	List<BillEntity> findByCategoryCustomQuery(Integer categoryId);
 	
 	List<BillEntity> findByBillCreatedBetween(LocalDate startDate, LocalDate endDate);
+	
+	List<BillEntity> findByOffer(OfferEntity offer);
 
 }

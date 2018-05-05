@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.project.entities.CategoryEntity;
 import com.example.project.repositories.CategoryRepository;
+import com.example.project.repositories.OfferRepository;
+import com.example.project.services.BillService;
 
 @RestController
 @RequestMapping(value = "/api/v1/project/categories")
@@ -18,6 +20,12 @@ public class CategoryController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private BillService billService;
+	
+	@Autowired
+	private OfferRepository offerRepository;
 
 	// Vrati sve kategorije TESTIRAO
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -46,7 +54,9 @@ public class CategoryController {
 	// Obrisi kategoriju po ID-u TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public CategoryEntity deleteCategory(@PathVariable Integer id) {
-		if (categoryRepository.existsById(id)) {
+		if (categoryRepository.existsById(id) 
+				&& !offerRepository.existsByCategory(categoryRepository.findById(id).get())
+				&& billService.findActiveByCategory(id).size() == 0) {
 			CategoryEntity temp = categoryRepository.findById(id).get();
 			categoryRepository.deleteById(id);
 			return temp;

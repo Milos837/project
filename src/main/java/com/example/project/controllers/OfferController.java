@@ -1,14 +1,17 @@
 package com.example.project.controllers;
 
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.project.entities.OfferEntity;
 import com.example.project.entities.enums.EOfferStatus;
@@ -16,6 +19,8 @@ import com.example.project.entities.enums.EUserRole;
 import com.example.project.repositories.CategoryRepository;
 import com.example.project.repositories.OfferRepository;
 import com.example.project.repositories.UserRepository;
+import com.example.project.services.BillService;
+import com.example.project.services.FileHandler;
 
 @RestController
 @RequestMapping(value = "/api/v1/project/offers")
@@ -29,6 +34,12 @@ public class OfferController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private FileHandler fileHandler;
+	
+	@Autowired
+	private BillService billService;
 
 	// Vrati sve ponude TESTIRAO
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -94,6 +105,10 @@ public class OfferController {
 	public OfferEntity updateOfferStatus(@PathVariable Integer id, @PathVariable EOfferStatus status) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offer = offerRepository.findById(id).get();
+			if(status.equals(EOfferStatus.EXPIRED)) {
+				offer.setOfferstatus(status);
+				billService.cancelBillsByExpiredOffer(id);
+			}
 			offer.setOfferstatus(status);
 			return offerRepository.save(offer);
 		}
@@ -111,6 +126,13 @@ public class OfferController {
 	public OfferEntity changeCategory(@PathVariable Integer offerId, @PathVariable Integer catId) {
 		OfferEntity offer = offerRepository.findById(offerId).get();
 		offer.setCategory(categoryRepository.findById(catId).get());
+		return offerRepository.save(offer);
+	}
+	
+	@PutMapping(value = "/uploadImage/{id}")
+	public OfferEntity uploadImage(@RequestParam("file") MultipartFile file, @PathVariable Integer id) {
+		OfferEntity offer = offerRepository.findById(id).get();
+		offer.setImagePath(fileHandler.singleFileUpload(file).toString());
 		return offerRepository.save(offer);
 	}
 
