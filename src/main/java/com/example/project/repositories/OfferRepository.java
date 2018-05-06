@@ -11,6 +11,7 @@ public interface OfferRepository extends CrudRepository<OfferEntity, Integer> {
 	
 	List<OfferEntity> findByActtionPriceBetween(Double lowerPrice, Double upperPrice);
 	
+	//	TESTIRAO
 	Boolean existsByCategory(CategoryEntity cat);
 
 }

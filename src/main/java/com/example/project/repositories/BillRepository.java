@@ -11,6 +11,7 @@ import com.example.project.entities.OfferEntity;
 
 public interface BillRepository extends CrudRepository<BillEntity, Integer> {
 	
+	//	TESTIRAO
 	@Query("SELECT b "
 			+ "FROM OfferEntity o JOIN BillEntity b ON b.offer=o.id JOIN CategoryEntity c ON c.id=o.category "
 			+ "WHERE c.id = ?1")

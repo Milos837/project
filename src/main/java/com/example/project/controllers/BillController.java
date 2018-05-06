@@ -60,18 +60,24 @@ public class BillController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public BillEntity updateBillById(@PathVariable Integer id, @RequestBody BillEntity billEntity) {
 		BillEntity bill = billRepository.findById(id).get();
-		bill.setUser(billEntity.getUser());
-		bill.setOffer(billEntity.getOffer());
-		bill.setBillCreated(billEntity.getBillCreated());
-		if (billEntity.getPaymentMade()) {
+		if (billEntity.getUser() != null) {
+			bill.setUser(billEntity.getUser());
+		}
+		if (billEntity.getOffer() != null) {
+			bill.setOffer(billEntity.getOffer());
+		}
+		if (billEntity.getBillCreated() != null) {
+			bill.setBillCreated(billEntity.getBillCreated());
+		}
+		if (billEntity.getPaymentMade() != null && Boolean.TRUE.equals(billEntity.getPaymentMade())) {
 			voucherService.createVoucherForBill(bill);
 			bill.setPaymentMade(billEntity.getPaymentMade());
 		} else {
 			bill.setPaymentMade(billEntity.getPaymentMade());
 		}
-		if (billEntity.getPaymentCanceled()) {
+		if (billEntity.getPaymentCanceled() != null && Boolean.TRUE.equals(billEntity.getPaymentCanceled())) {
 			bill.setPaymentCanceled(true);
-			offerService.updateSoldAvailable(billEntity.getOffer().getId(), -1);
+			offerService.updateSoldAvailable(bill.getOffer().getId(), -1);
 		} else {
 			bill.setPaymentCanceled(false);
 		}

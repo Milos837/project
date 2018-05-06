@@ -1,6 +1,6 @@
 package com.example.project.controllers;
 
-import java.time.LocalDate; 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +34,10 @@ public class OfferController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
-	
+
 	@Autowired
 	private FileHandler fileHandler;
-	
+
 	@Autowired
 	private BillService billService;
 
@@ -105,7 +105,7 @@ public class OfferController {
 	public OfferEntity updateOfferStatus(@PathVariable Integer id, @PathVariable EOfferStatus status) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offer = offerRepository.findById(id).get();
-			if(status.equals(EOfferStatus.EXPIRED)) {
+			if (status.equals(EOfferStatus.EXPIRED)) {
 				offer.setOfferstatus(status);
 				billService.cancelBillsByExpiredOffer(id);
 			}
@@ -128,12 +128,16 @@ public class OfferController {
 		offer.setCategory(categoryRepository.findById(catId).get());
 		return offerRepository.save(offer);
 	}
-	
+
+	// Uploaduje sliku za ponudu
 	@PutMapping(value = "/uploadImage/{id}")
 	public OfferEntity uploadImage(@RequestParam("file") MultipartFile file, @PathVariable Integer id) {
-		OfferEntity offer = offerRepository.findById(id).get();
-		offer.setImagePath(fileHandler.singleFileUpload(file).toString());
-		return offerRepository.save(offer);
+		if (offerRepository.existsById(id)) {
+			OfferEntity offer = offerRepository.findById(id).get();
+			offer.setImagePath(fileHandler.singleFileUpload(file).toString());
+			return offerRepository.save(offer);
+		}
+		return null;
 	}
 
 }

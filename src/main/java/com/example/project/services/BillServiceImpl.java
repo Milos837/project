@@ -19,13 +19,14 @@ public class BillServiceImpl implements BillService{
 	@Autowired
 	private OfferRepository offerRepository;
 
+	//	TESTIRAO
 	@Override
 	public List<BillEntity> findActiveByCategory(Integer catId) {
 		List<BillEntity> bills = billRepository.findByCategoryCustomQuery(catId);
 		Iterator<BillEntity> active = bills.iterator();
 		while(active.hasNext()) {
 			BillEntity bill = active.next();
-			if(bill.getPaymentCanceled() && bill.getPaymentMade()) {
+			if(Boolean.TRUE.equals(bill.getPaymentCanceled()) || Boolean.TRUE.equals(bill.getPaymentMade())) {
 				active.remove();
 			}
 		}
