@@ -5,12 +5,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.project.entities.OfferEntity;
 import com.example.project.entities.VoucherEntity;
 import com.example.project.entities.enums.EUserRole;
 import com.example.project.repositories.OfferRepository;
@@ -39,7 +38,8 @@ public class VoucherController {
 	// Dodaj voucher TESTIRAO
 	@RequestMapping(value = "/{offerId}/buyer/{buyerId}", method = RequestMethod.POST)
 	public VoucherEntity addVoucher(@PathVariable Integer offerId, @PathVariable Integer buyerId) {
-		if (userRepository.findById(buyerId).get().getUserRole().equals(EUserRole.ROLE_CUSTOMER)
+		if (userRepository.existsById(buyerId)
+				&& userRepository.findById(buyerId).get().getUserRole().equals(EUserRole.ROLE_CUSTOMER)
 				&& offerRepository.existsById(offerId)) {
 			VoucherEntity voucher = new VoucherEntity();
 			voucher.setOffer(offerRepository.findById(offerId).get());
@@ -53,22 +53,29 @@ public class VoucherController {
 
 	// Izmeni voucher
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public VoucherEntity updateVoucher(@RequestParam Integer offerId, @RequestParam Integer buyerId,
-			@RequestParam String expDate, @RequestParam Boolean isUsed, @PathVariable Integer id) {
-		if (userRepository.findById(buyerId).get().getUserRole().equals(EUserRole.ROLE_CUSTOMER)
-				&& offerRepository.existsById(offerId)) {
-			VoucherEntity voucher = new VoucherEntity();
-			OfferEntity offer = offerRepository.findById(id).get();
-			voucher.setOffer(offer);
-			voucher.setUser(userRepository.findById(buyerId).get());
-			voucher.setExpirationDate(LocalDate.parse(expDate));
-			voucher.setIsUsed(isUsed);
+	public VoucherEntity updateVoucher(@PathVariable Integer id, @RequestBody VoucherEntity voucherEntity) {
+		if (voucherRepository.existsById(id)) {
+			VoucherEntity voucher = voucherRepository.findById(id).get();
+
+			if (voucherEntity.getUser() != null && userRepository.existsById(voucherEntity.getUser().getId())
+					&& voucherEntity.getUser().getUserRole().equals(EUserRole.ROLE_CUSTOMER)) {
+				voucher.setUser(voucherEntity.getUser());
+			}
+			if (voucherEntity.getOffer() != null && offerRepository.existsById(voucherEntity.getOffer().getId())) {
+				voucher.setOffer(voucherEntity.getOffer());
+			}
+			if (voucherEntity.getExpirationDate() != null) {
+				voucher.setExpirationDate(voucherEntity.getExpirationDate());
+			}
+			if (voucherEntity.getIsUsed() != null) {
+				voucher.setIsUsed(voucherEntity.getIsUsed());
+			}
 			return voucherRepository.save(voucher);
 		}
 		return null;
 	}
 
-	// Obrisi voucher
+	// Obrisi voucher TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public VoucherEntity deleteById(@PathVariable Integer id) {
 		VoucherEntity temp = voucherRepository.findById(id).get();

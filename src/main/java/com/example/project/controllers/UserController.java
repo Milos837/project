@@ -47,10 +47,18 @@ public class UserController {
 	public UserEntity updateUser(@PathVariable Integer id, @RequestBody UserEntity user) {
 		if (userRepository.existsById(id)) {
 			UserEntity userEntity = userRepository.findById(id).get();
-			userEntity.setFirstName(user.getFirstName());
-			userEntity.setLastName(user.getLastName());
-			userEntity.setEmail(user.getEmail());
-			userEntity.setUsername(user.getUsername());
+			if (user.getFirstName() != null) {
+				userEntity.setFirstName(user.getFirstName());
+			}
+			if (user.getLastName() != null) {
+				userEntity.setLastName(user.getLastName());
+			}
+			if (user.getEmail() != null) {
+				userEntity.setEmail(user.getEmail());
+			}
+			if (user.getUsername() != null) {
+				userEntity.setUsername(user.getUsername());
+			}
 			return userRepository.save(userEntity);
 		}
 		return null;

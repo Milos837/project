@@ -62,33 +62,22 @@ public class BillController {
 		return temp;
 	}
 
-	// Izmeni racun - stavio sam provere za sve posebno da bi se u body PUT metode
-	// mogao staviti samo jedan atribut TESTIRAO
+	// Izmeni racun TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public BillEntity updateBillById(@PathVariable Integer id, @RequestBody BillEntity billEntity) {
-		BillEntity bill = billRepository.findById(id).get();
-		if (billEntity.getUser() != null) {
-			bill.setUser(billEntity.getUser());
+		if (billRepository.existsById(id)) {
+			BillEntity bill = billRepository.findById(id).get();
+			if (billEntity.getPaymentMade() != null && Boolean.TRUE.equals(billEntity.getPaymentMade())) {
+				voucherService.createVoucherForBill(bill);
+				bill.setPaymentMade(billEntity.getPaymentMade());
+			} 
+			if (billEntity.getPaymentCanceled() != null && Boolean.TRUE.equals(billEntity.getPaymentCanceled())) {
+				bill.setPaymentCanceled(true);
+				offerService.updateSoldAvailable(bill.getOffer().getId(), -1);
+			} 
+			return billRepository.save(bill);
 		}
-		if (billEntity.getOffer() != null) {
-			bill.setOffer(billEntity.getOffer());
-		}
-		if (billEntity.getBillCreated() != null) {
-			bill.setBillCreated(billEntity.getBillCreated());
-		}
-		if (billEntity.getPaymentMade() != null && Boolean.TRUE.equals(billEntity.getPaymentMade())) {
-			voucherService.createVoucherForBill(bill);
-			bill.setPaymentMade(billEntity.getPaymentMade());
-		} else {
-			bill.setPaymentMade(billEntity.getPaymentMade());
-		}
-		if (billEntity.getPaymentCanceled() != null && Boolean.TRUE.equals(billEntity.getPaymentCanceled())) {
-			bill.setPaymentCanceled(true);
-			offerService.updateSoldAvailable(bill.getOffer().getId(), -1);
-		} else {
-			bill.setPaymentCanceled(false);
-		}
-		return billRepository.save(bill);
+		return null;
 	}
 
 	// Nadji racune po kupcu TESTIRAO

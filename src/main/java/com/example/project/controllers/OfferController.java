@@ -71,14 +71,30 @@ public class OfferController {
 	public OfferEntity updateOffer(@PathVariable Integer id, @RequestBody OfferEntity offer) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offerEntity = offerRepository.findById(id).get();
-			offerEntity.setActtionPrice(offer.getActtionPrice());
-			offerEntity.setAvailableOffers(offer.getAvailableOffers());
-			offerEntity.setBoughtOffers(offer.getBoughtOffers());
-			offerEntity.setImagePath(offer.getImagePath());
-			offerEntity.setOfferCreated(offer.getOfferCreated());
-			offerEntity.setOfferExpires(offer.getOfferExpires());
-			offerEntity.setOfferName(offer.getOfferName());
-			offerEntity.setRegularPrice(offer.getRegularPrice());
+			if (offer.getActtionPrice() != null) {
+				offerEntity.setActtionPrice(offer.getActtionPrice());
+			}
+			if (offer.getAvailableOffers() != null) {
+				offerEntity.setAvailableOffers(offer.getAvailableOffers());
+			}
+			if (offer.getBoughtOffers() != null) {
+				offerEntity.setBoughtOffers(offer.getBoughtOffers());
+			}
+			if (offer.getImagePath() != null) {
+				offerEntity.setImagePath(offer.getImagePath());
+			}
+			if (offer.getOfferCreated() != null) {
+				offerEntity.setOfferCreated(offer.getOfferCreated());
+			}
+			if (offer.getOfferExpires() != null) {
+				offerEntity.setOfferExpires(offer.getOfferExpires());
+			}
+			if (offer.getOfferName() != null) {
+				offerEntity.setOfferName(offer.getOfferName());
+			}
+			if (offer.getRegularPrice() != null) {
+				offerEntity.setRegularPrice(offer.getRegularPrice());
+			}
 			return offerRepository.save(offerEntity);
 		}
 		return null;
