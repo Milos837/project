@@ -30,7 +30,7 @@ public class VoucherController {
 	@Autowired
 	private OfferRepository offerRepository;
 
-	// Vrati sve vouchere
+	// Vrati sve vouchere TESTIRAO
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<VoucherEntity> getAllVouchers() {
 		return (List<VoucherEntity>) voucherRepository.findAll();
@@ -59,14 +59,7 @@ public class VoucherController {
 				&& offerRepository.existsById(offerId)) {
 			VoucherEntity voucher = new VoucherEntity();
 			OfferEntity offer = offerRepository.findById(id).get();
-			if (isUsed == false) {
-				offer.setAvailableOffers(offer.getAvailableOffers() - 1);
-				offer.setBoughtOffers(offer.getBoughtOffers() + 1);
-			} else {
-				offer.setAvailableOffers(offer.getAvailableOffers() + 1);
-				offer.setBoughtOffers(offer.getBoughtOffers() - 1);
-			}
-			voucher.setOffer(offerRepository.save(offer));
+			voucher.setOffer(offer);
 			voucher.setUser(userRepository.findById(buyerId).get());
 			voucher.setExpirationDate(LocalDate.parse(expDate));
 			voucher.setIsUsed(isUsed);

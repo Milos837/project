@@ -62,10 +62,10 @@ public class OfferEntity {
 	protected String imagePath;
 
 	@Column
-	protected Integer availableOffers = 0;
+	protected Integer availableOffers;
 
 	@Column
-	protected Integer boughtOffers = 0;
+	protected Integer boughtOffers;
 
 	@Column
 	protected EOfferStatus offerstatus;

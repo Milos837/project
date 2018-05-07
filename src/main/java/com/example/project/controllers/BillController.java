@@ -36,20 +36,25 @@ public class BillController {
 	@Autowired
 	private VoucherService voucherService;
 
+	// Nadji sve racune TESTIRAO
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<BillEntity> getAllBills() {
 		return (List<BillEntity>) billRepository.findAll();
 	}
 
+	// Kreiraj novi racun TESTIRAO
 	@RequestMapping(value = "/{offerId}/buyer/{buyerId}", method = RequestMethod.POST)
 	public BillEntity addBill(@PathVariable Integer offerId, @PathVariable Integer buyerId) {
 		BillEntity bill = new BillEntity();
 		bill.setOffer(offerRepository.save(offerService.updateSoldAvailable(offerId, 1)));
 		bill.setUser(userRepository.findById(buyerId).get());
 		bill.setBillCreated(LocalDate.now());
+		bill.setPaymentMade(false);
+		bill.setPaymentCanceled(false);
 		return billRepository.save(bill);
 	}
 
+	// Obrisi racun TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public BillEntity deleteBill(@PathVariable Integer id) {
 		BillEntity temp = billRepository.findById(id).get();
@@ -57,6 +62,8 @@ public class BillController {
 		return temp;
 	}
 
+	// Izmeni racun - stavio sam provere za sve posebno da bi se u body PUT metode
+	// mogao staviti samo jedan atribut TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public BillEntity updateBillById(@PathVariable Integer id, @RequestBody BillEntity billEntity) {
 		BillEntity bill = billRepository.findById(id).get();
@@ -84,16 +91,22 @@ public class BillController {
 		return billRepository.save(bill);
 	}
 
+	// Nadji racune po kupcu TESTIRAO
 	@RequestMapping(value = "/findByBuyer/{buyerId}", method = RequestMethod.GET)
-	public List<BillEntity> findByBuyer(@PathVariable Integer id) {
-		return userRepository.findById(id).get().getBill();
+	public List<BillEntity> findByBuyer(@PathVariable Integer buyerId) {
+		if (userRepository.existsById(buyerId)) {
+			return userRepository.findById(buyerId).get().getBill();
+		}
+		return null;
 	}
 
+	// Nadji racune po kategoriji TESTIRAO
 	@RequestMapping(value = "/findByCategory/{categoryId}", method = RequestMethod.GET)
 	public List<BillEntity> findByCategory(@PathVariable Integer categoryId) {
 		return billRepository.findByCategoryCustomQuery(categoryId);
 	}
 
+	// Nadji racune izmedju dva datuma TESTIRAO
 	@RequestMapping(value = "/findByDate/{startDate}/and/{endDate}", method = RequestMethod.GET)
 	public List<BillEntity> findByDate(@PathVariable String startDate, @PathVariable String endDate) {
 		LocalDate startDateParsed = LocalDate.parse(startDate);
