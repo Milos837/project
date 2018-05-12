@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,14 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.project.controllers.util.RESTError;
 import com.example.project.entities.OfferEntity;
 import com.example.project.entities.enums.EOfferStatus;
 import com.example.project.entities.enums.EUserRole;
 import com.example.project.repositories.CategoryRepository;
 import com.example.project.repositories.OfferRepository;
 import com.example.project.repositories.UserRepository;
+import com.example.project.security.Views;
 import com.example.project.services.BillService;
 import com.example.project.services.FileHandler;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 @RequestMapping(value = "/api/v1/project/offers")
@@ -42,15 +47,16 @@ public class OfferController {
 	private BillService billService;
 
 	// Vrati sve ponude TESTIRAO
+	@JsonView(Views.Public.class)
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public List<OfferEntity> getOffers() {
-		return (List<OfferEntity>) offerRepository.findAll();
+	public ResponseEntity<?> getOffers() {
+		return new ResponseEntity<List<OfferEntity>>((List<OfferEntity>) offerRepository.findAll(), HttpStatus.OK);
 	}
 
 	// Dodaj novu ponudu i povezi kategoriju i korisnika
 	// Korisnik mora biti ROLE_SELLER TESTIRAO
 	@RequestMapping(value = "/{categoryId}/seller/{sellerId}", method = RequestMethod.POST)
-	public OfferEntity addCategoryAndUserForOffer(@PathVariable Integer categoryId, @PathVariable Integer sellerId) {
+	public ResponseEntity<?> addCategoryAndUserForOffer(@PathVariable Integer categoryId, @PathVariable Integer sellerId) {
 		if (userRepository.findById(sellerId).get().getUserRole().equals(EUserRole.ROLE_SELLER)) {
 			OfferEntity offer = new OfferEntity();
 			offer.setCategory(categoryRepository.findById(categoryId).get());
@@ -61,14 +67,14 @@ public class OfferController {
 			offer.setActtionPrice(.0);
 			offer.setAvailableOffers(1);
 			offer.setBoughtOffers(0);
-			return offerRepository.save(offer);
+			return new ResponseEntity<OfferEntity>(offerRepository.save(offer), HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(2, "User not found"), HttpStatus.NOT_FOUND);
 	}
 
 	// Azuriraj ponudu TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public OfferEntity updateOffer(@PathVariable Integer id, @RequestBody OfferEntity offer) {
+	public ResponseEntity<?> updateOffer(@PathVariable Integer id, @RequestBody OfferEntity offer) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offerEntity = offerRepository.findById(id).get();
 			if (offer.getActtionPrice() != null) {
@@ -95,71 +101,72 @@ public class OfferController {
 			if (offer.getRegularPrice() != null) {
 				offerEntity.setRegularPrice(offer.getRegularPrice());
 			}
-			return offerRepository.save(offerEntity);
+			return new ResponseEntity<OfferEntity>(offerRepository.save(offerEntity), HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(5, "Offer not found"), HttpStatus.NOT_FOUND);
 	}
 
 	// Obrisi ponudu po ID-u TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public OfferEntity deleteOffer(@PathVariable Integer id) {
+	public ResponseEntity<?> deleteOffer(@PathVariable Integer id) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offer = offerRepository.findById(id).get();
 			offerRepository.deleteById(id);
-			return offer;
+			return new ResponseEntity<OfferEntity>(offer, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(5, "Offer not found"), HttpStatus.NOT_FOUND);
 	}
 
 	// Vrati ponudu po ID-u TESTIRAO
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public OfferEntity getOffer(@PathVariable Integer id) {
+	public ResponseEntity<?> getOffer(@PathVariable Integer id) {
 		if (offerRepository.existsById(id)) {
-			return offerRepository.findById(id).get();
+			return new ResponseEntity<OfferEntity>(offerRepository.findById(id).get(), HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(5, "Offer not found"), HttpStatus.NOT_FOUND);
 	}
 
 	// Promeni status ponude TESTIRAO
 	@RequestMapping(value = "/{id}/status/{status}", method = RequestMethod.PUT)
-	public OfferEntity updateOfferStatus(@PathVariable Integer id, @PathVariable EOfferStatus status) {
+	public ResponseEntity<?> updateOfferStatus(@PathVariable Integer id, @PathVariable EOfferStatus status) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offer = offerRepository.findById(id).get();
 			if (status.equals(EOfferStatus.EXPIRED)) {
 				billService.cancelBillsByExpiredOffer(id);
 			}
 			offer.setOfferstatus(status);
-			return offerRepository.save(offer);
+			return new ResponseEntity<OfferEntity>(offerRepository.save(offer), HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(5, "Offer not found"), HttpStatus.NOT_FOUND);
 	}
 
 	// Nadji ponude izmedju zadate cene TESTIRAO
 	@RequestMapping(value = "/findByPrice/{lowerPrice}/and/{upperPrice}", method = RequestMethod.GET)
-	public List<OfferEntity> findByPrice(@PathVariable Double lowerPrice, @PathVariable Double upperPrice) {
-		return offerRepository.findByActtionPriceBetween(lowerPrice, upperPrice);
+	public ResponseEntity<?> findByPrice(@PathVariable Double lowerPrice, @PathVariable Double upperPrice) {
+		List<OfferEntity> offers = offerRepository.findByActtionPriceBetween(lowerPrice, upperPrice);
+		return new ResponseEntity<List<OfferEntity>>(offers, HttpStatus.OK);
 	}
 
 	// Promeni kategoriju ponude TESTIRAO
 	@RequestMapping(value = "/{offerId}/category/{categoryId}", method = RequestMethod.PUT)
-	public OfferEntity changeCategory(@PathVariable Integer offerId, @PathVariable Integer categoryId) {
+	public ResponseEntity<?> changeCategory(@PathVariable Integer offerId, @PathVariable Integer categoryId) {
 		if (offerRepository.existsById(offerId) && categoryRepository.existsById(categoryId)) {
 			OfferEntity offer = offerRepository.findById(offerId).get();
 			offer.setCategory(categoryRepository.findById(categoryId).get());
-			return offerRepository.save(offer);
+			return new ResponseEntity<OfferEntity>(offerRepository.save(offer), HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(5, "Offer not found"), HttpStatus.NOT_FOUND);
 	}
 
 	// Uploaduje sliku za ponudu TESTIRAO
 	@PutMapping(value = "/uploadImage/{id}")
-	public OfferEntity uploadImage(@RequestParam("file") MultipartFile file, @PathVariable Integer id) {
+	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, @PathVariable Integer id) {
 		if (offerRepository.existsById(id)) {
 			OfferEntity offer = offerRepository.findById(id).get();
 			offer.setImagePath(fileHandler.singleFileUpload(file).toString());
-			return offerRepository.save(offer);
+			return new ResponseEntity<OfferEntity>(offerRepository.save(offer), HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<RESTError>(new RESTError(5, "Offer not found"), HttpStatus.NOT_FOUND);
 	}
 
 }

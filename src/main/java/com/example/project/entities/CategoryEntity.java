@@ -12,8 +12,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.example.project.security.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name = "category")
@@ -22,6 +24,7 @@ public class CategoryEntity {
 
 	@Id
 	@GeneratedValue
+	@JsonView(Views.Public.class)
 	protected Integer id;
 	
 	@OneToMany(mappedBy = "category", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
@@ -29,9 +32,11 @@ public class CategoryEntity {
 	protected List<OfferEntity> offer;
 	
 	@Column
+	@JsonView(Views.Public.class)
 	protected String categoryName;
 	
 	@Column
+	@JsonView(Views.Public.class)
 	protected String categoryDescription;
 	
 	@Version

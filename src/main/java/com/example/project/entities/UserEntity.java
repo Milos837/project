@@ -13,16 +13,19 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.example.project.entities.enums.EUserRole;
+import com.example.project.security.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name = "user")
-@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "password" })
 public class UserEntity {
 
 	@Id
 	@GeneratedValue
+	@JsonView(Views.Public.class)
 	protected Integer id;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
@@ -38,21 +41,26 @@ public class UserEntity {
 	protected List<OfferEntity> offer;
 
 	@Column
+	@JsonView(Views.Private.class)
 	protected String firstName;
 
 	@Column
+	@JsonView(Views.Private.class)
 	protected String lastName;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected String username;
 
 	@Column
 	protected String password;
 
 	@Column
+	@JsonView(Views.Private.class)
 	protected String email;
 
 	@Column
+	@JsonView(Views.Admin.class)
 	protected EUserRole userRole;
 
 	@Version

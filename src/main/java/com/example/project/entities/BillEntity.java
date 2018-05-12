@@ -13,29 +13,40 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.example.project.security.Views;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 @Table(name = "bill")
 public class BillEntity {
 	
 	@Id
 	@GeneratedValue
+	@JsonView(Views.Public.class)
 	protected Integer id;
 	
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user")
+	@JsonView(Views.Private.class)
 	protected UserEntity user;
 	
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "offer")
+	@JsonView(Views.Private.class)
 	protected OfferEntity offer;
 	
 	@Column
+	@JsonView(Views.Admin.class)
 	protected Boolean paymentMade;
 	
 	@Column
+	@JsonView(Views.Admin.class)
 	protected Boolean paymentCanceled;
 	
 	@Column
+	@JsonView(Views.Public.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	protected LocalDate billCreated;
 	
 	@Version

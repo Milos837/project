@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Table(name = "voucher")
 public class VoucherEntity {
@@ -29,6 +31,7 @@ public class VoucherEntity {
 	private OfferEntity offer;
 
 	@Column
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	protected LocalDate expirationDate;
 
 	@Column

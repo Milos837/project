@@ -15,8 +15,10 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.example.project.entities.enums.EOfferStatus;
+import com.example.project.security.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name = "offer")
@@ -25,6 +27,7 @@ public class OfferEntity {
 
 	@Id
 	@GeneratedValue
+	@JsonView(Views.Public.class)
 	protected Integer id;
 
 	@OneToMany(mappedBy = "offer", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
@@ -37,37 +40,48 @@ public class OfferEntity {
 
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user")
+	@JsonView(Views.Public.class)
 	protected UserEntity user;
 
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "category")
+	@JsonView(Views.Public.class)
 	protected CategoryEntity category;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected String offerName;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected String offerCreated;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected String offerExpires;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected Double regularPrice;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected Double acttionPrice;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected String imagePath;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected Integer availableOffers;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected Integer boughtOffers;
 
 	@Column
+	@JsonView(Views.Public.class)
 	protected EOfferStatus offerstatus;
 
 	@Version
